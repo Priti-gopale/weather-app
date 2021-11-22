@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+        integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Weather app</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="" type="">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    {{>navbar}}
+    <!-- main header -->
+    <div class="container-fluid main_header">
+        <div class="row">
+            <div class="col-md-10 col-12 mx-auto">
+
+
+               <div class="main_content">
+                   <form class="temp_form">
+                       <input type="text" id="cityName" placeholder="Enter your city name" autocomplete="off">
+                       <input type="submit" value="check" id="submitBtn">
+                   </form>
+               </div>
+               <div class="tempInformation">
+                   <div class="top_layer">
+                       <p id="today_date">13 oct</p>
+                   </div>
+                   <div class="main_layer">
+                       <p id="city_name">Get output here</p>
+                       <div class="middle_layer data_hide">
+                           <p id="temp"><Span id="temp_real_val">0</Span><sup>o</sup>C</p>
+                           <p id="temp_status"><i class="fa fa-cloud" aria-hidden="true"></i></p>
+                       </div>
+                   </div>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <p>Created By Priti Gopale</p>
+    </footer>
+
+    <script>
+        const cityName=document.getElementById('cityName');
+const submitBtn=document.getElementById('submitBtn');
+const city_name=document.getElementById('city_name');
+const temp_real_val=document.getElementById('temp_real_val');
+const temp_status=document.getElementById('temp_status');
+const datahide=document.querySelector('.middle_layer')
+
+const getInfo=async(event)=>
+{
+    event.preventDefault();
+    let cityVal=cityName.value;
+     if(cityVal=="")
+     {
+       city_name.innerText=`Please enter city name before search`;
+       datahide.classList.add('data_hide')
+     }
+     else
+     {
+         try{
+        let url= `https://api.openweathermap.org/data/2.5/weather?q=${cityVal}&units=metric&appid=39f650044139ea55f09f364be4218ffe`;
+        const response=await fetch(url);
+        const data= await response.json();
+        const arrData=[data];
+
+        city_name.innerText=`${arrData[0].name}`,`${arrData[0].sys.country}`;
+        temp_real_val.innerText=arrData[0].main.temp;
+        
+
+const tempStatus=arrData[0].weather[0].main;
+        if(tempStatus=="Sunny")
+        {
+            temp_status.innerHTML= "<i class='fas fa-sun style='color: #c4c411;'></i>"
+        }
+       else if(tempStatus=="Clouds")
+        {
+            temp_status.innerHTML= "<i class='fas fa-cloud style='color: #fff;'></i>"
+        }
+       else if(tempStatus=="Rain")
+        {
+            temp_status.innerHTML= "<i class='fas fa-rain style='color: #a4b0be;'></i>"
+        }
+        else if(tempStatus=="Clear")
+        {
+            temp_status.innerHTML= "<i class='fas fa-sun style='color: #eccc68;'></i>"
+        }
+      datahide.classList.remove('data_hide')
+        //console.log(arrData);
+        }
+        catch{
+            city_name.innerText=`Please enter proper city name`;
+        }
+
+
+     }
+
+}
+
+submitBtn.addEventListener('click',getInfo);
+    </script>
+
+    <script>
+        const curDate = document.getElementById("today_date");
+        const getCurrentDay = () => {
+            var weekday = new Array(7);
+            weekday[0] = "Sunday";
+            weekday[1] = "Monday";
+            weekday[2] = "Tuesday";
+            weekday[3] = "Wednesday";
+            weekday[4] = "Thursday";
+            weekday[5] = "Friday";
+            weekday[6] = "Saturday";
+            let currentTime = new Date();
+            let day=weekday[currentTime.getDay()];
+            return day;
+        };
+       
+        const getCurrentTime=()=>{
+            var months=[
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sept",
+                "Oct",
+                "Nov",
+                "Dec"
+            ]
+            var now=new Date();
+            var month=months[now.getMonth()];
+            var date=now.getDate();
+            
+            let hours=now.getHours();
+            let mins=now.getMinutes();
+
+            let periods="AM";
+            if(hours>11){
+                periods="PM";
+                if(hours>12)
+                hours-=12
+            }
+
+            if(mins<10)
+            {
+                mins="0"+mins;
+            }
+            return `${month} ${date} | ${hours}:${mins}${periods}`;
+        };
+       today_date.innerHTML= getCurrentDay() +" | " + getCurrentTime();
+    </script>
+</body>
+
+</html>
